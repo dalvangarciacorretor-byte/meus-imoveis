@@ -229,6 +229,8 @@ const ICON = {
   msg:'<path d="M4 5h16v11H9l-5 4z"/>', copy:'<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 00-1-1H5a1 1 0 00-1 1v10a1 1 0 001 1h3"/>',
   star:'<path d="M12 3l2.7 5.6 6.1.8-4.5 4.3 1.1 6.1L12 16.9 6.6 19.8l1.1-6.1L3.2 9.4l6.1-.8z"/>',
   gps:'<circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>',
+  download:'<path d="M12 4v12M7 11l5 5 5-5M5 20h14"/>',
+  eye:'<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
   route:'<circle cx="6" cy="18" r="2"/><circle cx="18" cy="6" r="2"/><path d="M8 18h6a3 3 0 000-6h-4a3 3 0 010-6h6"/>'
 };
 const ic = (n, s = 20) => `<svg class="ic" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[n] || ''}</svg>`;
@@ -676,11 +678,11 @@ function renderTab(){
     const crumbs = `<div class="crumbs"><button data-a="doc-crumb" data-i="-1">Documentos</button>${S.docPath.map((p, i) => `${ic('next', 14)}<button data-a="doc-crumb" data-i="${i}">${esc(p.name)}</button>`).join('')}</div>`;
     const sug = (F && !F.length && !S.docPath.length) ? `<div class="note">Dica: organize por tipo de documento. <button class="btn sm soft" data-a="doc-suggest" style="margin-left:6px">Criar pastas sugeridas</button><div class="small" style="margin-top:6px">Contrato · Matrícula e escritura · Documentos do proprietário · Outros</div></div>` : '';
     box.innerHTML = crumbs + `<div class="bar"><button class="btn sm" data-a="doc-upload">${ic('upload')} Enviar arquivo</button><button class="btn sm soft" data-a="doc-cam">${ic('camera')} Foto do documento</button><button class="btn sm ghost" data-a="doc-newfolder">${ic('folder')} Nova pasta</button></div>`
-      + `<div class="note">${ic('link', 16)} Documentos ficam só aqui no app e no seu Drive. Nunca vão junto com o que você envia ao cliente.</div>` + sug
+      + `<div class="note">${ic('link', 16)} Documentos não entram no “Enviar ao cliente”. Para mandar um, use o botão de enviar no próprio documento.</div>` + sug
       + (F === null ? loading : !F.length ? '<div class="empty">Pasta vazia.</div>'
         : `<div class="list">${F.map(f => f.mimeType === FOLDER
           ? `<button class="item" data-a="doc-folder" data-id="${f.id}" data-name="${esc(f.name)}"><div class="ico">${ic('folder')}</div><div class="tx"><b>${esc(f.name)}</b><span class="muted small">Pasta</span></div><span class="x" data-a="folder-del" data-id="${f.id}" data-name="${esc(f.name)}" aria-label="Excluir pasta">${ic('trash', 18)}</span></button>`
-          : `<div class="item"><div class="ico">${ic('file')}</div><div class="tx"><b>${esc(f.name)}</b><span class="muted small">${fmtSize(f.size)}</span></div>${f.webViewLink ? `<a class="btn sm ghost" href="${esc(f.webViewLink)}" target="_blank" rel="noopener">Abrir</a>` : ''}<button class="x" data-a="file-del" data-id="${f.id}" aria-label="Excluir">${ic('trash', 18)}</button></div>`).join('')}</div>`);
+          : `<div class="item"><div class="ico">${ic('file')}</div><div class="tx"><b>${esc(f.name)}</b><span class="muted small">${fmtSize(f.size)}</span></div>${f.webViewLink ? `<a class="x" href="${esc(f.webViewLink)}" target="_blank" rel="noopener" title="Abrir" aria-label="Abrir">${ic('eye', 19)}</a>` : ''}<button class="x" data-a="doc-dl" data-id="${f.id}" title="Baixar" aria-label="Baixar">${ic('download', 19)}</button><button class="x" data-a="doc-send" data-id="${f.id}" title="Enviar" aria-label="Enviar">${ic('share', 19)}</button><button class="x" data-a="file-del" data-id="${f.id}" title="Excluir" aria-label="Excluir">${ic('trash', 18)}</button></div>`).join('')}</div>`);
   }
 }
 function selBarHTML(){
@@ -962,6 +964,14 @@ const A = {
     r.share = { fotos: false, videos: false }; c.o.fotos = false; c.o.videos = false;
     document.querySelectorAll('[data-o="fotos"],[data-o="videos"]').forEach(i => { i.checked = false; }); c.resetEdited(); c.upd(); toast('Links desativados');
   }),
+  'doc-dl': el => safe(async () => { const f = findFile(el.dataset.id); if (!f) return; saveFile(await fetchAsFile(f)); toast('Baixando "' + f.name + '"'); }),
+  'doc-send': el => safe(async () => {
+    const f = findFile(el.dataset.id); if (!f) return;
+    const file = await fetchAsFile(f);
+    if (!(navigator.canShare && navigator.canShare({ files: [file] }))){ saveFile(file); return toast('Este navegador não envia arquivo direto. Baixei o documento: é só anexar no WhatsApp.', true); }
+    A._prepared = [file];
+    openSheet(`<div class="hd"><h3>Documento pronto</h3><button class="btn sm ghost" data-a="sheet-close">${ic('x', 18)} Fechar</button></div><p><b>${esc(f.name)}</b></p><p class="muted small">Vai só este arquivo. Nada mais da pasta de documentos é enviado.</p><button class="btn block" data-a="sel-send-now">${ic('share', 18)} Escolher o app e enviar</button>`);
+  }),
   'up-clear': () => { UP.items = UP.items.filter(i => i.st === 'wait' || i.st === 'up'); renderUploads(); },
   'sel-send-now': () => { const p = A._prepared; if (!p) return; navigator.share({ files: p, title: cur()?.titulo }).catch(() => {}); },
   'set-signout': () => { if (confirm('Sair desta conta Google?')) { closeSheet().then(signOut); } },
@@ -969,6 +979,16 @@ const A = {
   'set-refresh': () => safe(async () => { const d = busy('Atualizando…'); try{ await refreshDB(); } finally { d(); } await closeSheet(); render(); toast('Lista atualizada'); }),
   'set-cid': () => { closeSheet().then(() => { LS.del('imob_cid'); S.screen = 'setup'; render(); }); }
 };
+async function fetchAsFile(f){
+  const done = busy('Preparando o arquivo…');
+  try{ const r = await gfetch(`${API}/files/${f.id}?alt=media`); const b = await r.blob(); return new File([b], f.name, { type: b.type || f.mimeType || 'application/octet-stream' }); }
+  finally { done(); }
+}
+function saveFile(file){
+  const u = URL.createObjectURL(file); const a = document.createElement('a');
+  a.href = u; a.download = file.name; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(u), 15000);
+}
 async function prepareSelShare(){
   const F = S.files.fotos || []; const ids = [...S.sel]; if (!ids.length) return;
   if (!navigator.canShare) return toast('Este navegador não envia imagens direto. Use o link das fotos.', true);
