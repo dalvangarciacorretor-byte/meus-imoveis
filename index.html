@@ -37,6 +37,27 @@ button{cursor:pointer;border:0;background:none}
 .top .who span{font-size:11px;letter-spacing:.03em;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .brandimg{display:block;width:min(340px,86vw);height:auto;mix-blend-mode:lighten}
 .wrap{max-width:720px;margin:0 auto;padding:14px 14px 110px}
+.wrap.wide{max-width:1040px}
+/* fundo com a marca (só na lista) */
+body.bgmark::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;background:url(marca-fundo.png) center 47%/135% auto no-repeat;opacity:.25;-webkit-mask-image:radial-gradient(ellipse 80% 62% at 50% 47%,#000 45%,transparent 92%);mask-image:radial-gradient(ellipse 80% 62% at 50% 47%,#000 45%,transparent 92%)}
+body.bgmark .wrap,body.bgmark .bighead{position:relative;z-index:1}
+/* cabeçalho grande */
+.bighead{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;padding:12px 12px 10px;padding-top:calc(12px + env(safe-area-inset-top));background:linear-gradient(#000,#000 70%,rgba(0,0,0,0))}
+.bighead .logo{height:104px;width:auto;max-width:92vw;mix-blend-mode:lighten}
+.bighead h1{color:var(--ink);font-size:22px}
+.bighead .sub{font-size:11px;letter-spacing:.03em;color:var(--muted)}
+.bighead .set{position:absolute;right:8px;top:calc(8px + env(safe-area-inset-top));color:var(--pri);width:40px;height:40px;border-radius:50%;display:grid;place-items:center}
+.minibar{position:fixed;left:0;right:0;top:0;z-index:14;background:#000;border-bottom:1px solid #3a3020;display:flex;align-items:center;gap:10px;padding:6px 12px;padding-top:calc(6px + env(safe-area-inset-top));transform:translateY(-110%);transition:transform .2s;visibility:hidden}
+body.scrolled .minibar{transform:none;visibility:visible}
+.minibar .emb{height:32px;width:auto;mix-blend-mode:lighten}
+.minibar b{flex:1;min-width:0;font-family:Georgia,serif;font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.minibar .ib{color:var(--pri);width:40px;height:40px;border-radius:50%;display:grid;place-items:center}
+/* ferramentas: busca + vista */
+.tools{display:flex;gap:8px;align-items:stretch}
+.tools .search{flex:1;min-width:0}
+.vt{display:flex;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:rgba(20,20,22,.76);flex:none}
+.vt button{width:42px;display:grid;place-items:center;color:var(--muted)}
+.vt button.on{background:var(--pri-soft);color:var(--pri)}
 .banner{background:var(--warn-bg);color:var(--warn);padding:10px 14px;font-size:14px;display:flex;gap:10px;align-items:center;justify-content:space-between}
 .banner button{background:var(--pri);color:var(--pri-ink);padding:6px 12px;border-radius:999px;font-weight:600;white-space:nowrap}
 
@@ -53,16 +74,27 @@ a.btn,a.item{text-decoration:none}
 .fab{position:fixed;right:16px;bottom:calc(18px + env(safe-area-inset-bottom));z-index:12;background:var(--pri);color:var(--pri-ink);padding:14px 20px;border-radius:999px;box-shadow:var(--shadow);font-weight:700;display:flex;gap:8px;align-items:center}
 
 /* lista */
-.search{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0 12px}
+.search{display:flex;align-items:center;gap:8px;background:rgba(20,20,22,.76);border:1px solid var(--line);border-radius:12px;padding:0 12px}
 .search input{flex:1;border:0;background:none;padding:12px 0;outline:0;min-width:0}
 .filters{display:flex;gap:8px;margin:10px 0 14px}
-.filters select{flex:1;min-width:0;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:9px 8px}
+.filters select{flex:1;min-width:0;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:9px 8px;background:rgba(20,20,22,.76)}
 .cards{display:grid;gap:12px}
-.card{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden;display:flex;text-align:left;width:100%}
+.card{background:rgba(20,20,22,.74);border:1px solid rgba(212,175,106,.10);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden;display:flex;text-align:left;width:100%}
 .card .cover{width:112px;min-height:112px;flex:none;background:var(--mut-bg) center/cover no-repeat;display:grid;place-items:center;color:var(--muted)}
 .card .info{padding:11px 12px;min-width:0;flex:1;display:flex;flex-direction:column;gap:3px}
 .card .t{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .card .price{font-family:Georgia,serif;font-weight:700;color:var(--pri);font-size:18px}
+.cards.grade{grid-template-columns:1fr 1fr}
+.cards.grade .card{flex-direction:column}
+.cards.grade .card .cover{width:100%;min-height:0;aspect-ratio:4/3}
+.cards.grade .card .t{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.cards.grade .card .price{font-size:16px}
+@media(min-width:900px){
+  .bighead .logo{height:128px}.bighead h1{font-size:26px}
+  .cards.lista{grid-template-columns:1fr 1fr}
+  .cards.grade{grid-template-columns:repeat(3,1fr)}
+  .fab{right:max(16px,calc(50% - 520px))}
+}
 .chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:auto}
 .chip{font-size:12px;font-weight:700;padding:3px 9px;border-radius:999px;background:var(--mut-bg);color:var(--muted)}
 .chip.ok{background:var(--ok-bg);color:var(--ok)}
@@ -231,6 +263,7 @@ const ICON = {
   gps:'<circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>',
   download:'<path d="M12 4v12M7 11l5 5 5-5M5 20h14"/>',
   eye:'<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+  list:'<path d="M4 6h16M4 12h16M4 18h16"/>', grid:'<rect x="4" y="4" width="6.5" height="6.5" rx="1"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1"/>',
   route:'<circle cx="6" cy="18" r="2"/><circle cx="18" cy="6" r="2"/><path d="M8 18h6a3 3 0 000-6h-4a3 3 0 010-6h6"/>'
 };
 const ic = (n, s = 20) => `<svg class="ic" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[n] || ''}</svg>`;
@@ -256,6 +289,7 @@ const S = {
   db: LS.get('imob_db') || { version:1, imoveis:[] },
   files:{ fotos:null, videos:null, docs:null }, docPath:[],
   sel:new Set(), selMode:false, q:'', fNeg:'', fSta:'',
+  vmode: (() => { const v = LS.get('imob_vmode'); return v === 'lista' || v === 'grade' ? v : (window.innerWidth >= 900 ? 'grade' : 'lista'); })(),
   authed:false, rootId:null, indexId:null, banner:'', needLogin:false,
   token:null, tokenExp:0
 };
@@ -549,8 +583,11 @@ function render(){
   else if (S.screen === 'login') app.innerHTML = loginHTML();
   else app.innerHTML = S.view === 'detail' && cur() ? detailHTML(cur()) : listHTML();
   if (S.screen === 'main'){ if (S.view === 'detail' && cur()) renderTab(); else renderItems(); }
+  document.body.classList.toggle('bgmark', S.screen === 'main' && !(S.view === 'detail' && cur()));
+  document.body.classList.remove('scrolled');
   window.scrollTo(0, 0);
 }
+window.addEventListener('scroll', () => document.body.classList.toggle('scrolled', document.body.classList.contains('bgmark') && window.scrollY > 130), { passive:true });
 function renderBanner(){
   const el = $('#banner'); if (!el) return;
   el.innerHTML = S.banner ? `<div class="banner"><span>${esc(S.banner)}</span>${S.needLogin ? '<button data-a="login">Entrar</button>' : ''}</div>` : '';
@@ -571,10 +608,12 @@ function loginHTML(){
   <button class="btn sm ghost" data-a="change-cid">Alterar ID do cliente</button></div></div>`;
 }
 function listHTML(){
-  return `<div class="top"><img class="emb" src="emblem.jpg" alt=""><div class="who"><h1>${esc(CORRETOR.nome)}</h1><span>Corretor de Imóveis · CRECI ${esc(CORRETOR.creci)}</span></div><button class="ib" data-a="settings" aria-label="Configurações">${ic('gear')}</button></div>
+  return `<div class="bighead"><img class="logo" src="logo-topo.jpg" alt="${esc(CORRETOR.nome)}"><h1>${esc(CORRETOR.nome)}</h1><span class="sub">Corretor de Imóveis · CRECI ${esc(CORRETOR.creci)}</span><button class="set" data-a="settings" aria-label="Configurações">${ic('gear')}</button></div>
+  <div class="minibar"><img class="emb" src="emblem.jpg" alt=""><b>${esc(CORRETOR.nome)}</b><button class="ib" data-a="settings" aria-label="Configurações">${ic('gear')}</button></div>
   <div id="banner"></div>
-  <div class="wrap">
-    <div class="search">${ic('search')}<input id="q" type="search" placeholder="Buscar por nome, bairro, código, dono…" value="${esc(S.q)}"></div>
+  <div class="wrap wide">
+    <div class="tools"><div class="search">${ic('search')}<input id="q" type="search" placeholder="Buscar por nome, bairro, código, dono…" value="${esc(S.q)}"></div>
+      <div class="vt"><button data-a="vm" data-m="lista" class="${S.vmode === 'lista' ? 'on' : ''}" aria-label="Ver em lista">${ic('list')}</button><button data-a="vm" data-m="grade" class="${S.vmode === 'grade' ? 'on' : ''}" aria-label="Ver em grade">${ic('grid')}</button></div></div>
     <div class="filters">
       <select id="fNeg"><option value="">Venda e aluguel</option>${Object.entries(NEGOCIO).map(([k, v]) => `<option value="${k}" ${S.fNeg === k ? 'selected' : ''}>${v}</option>`).join('')}</select>
       <select id="fSta"><option value="">Todos os status</option>${Object.entries(STATUS).map(([k, v]) => `<option value="${k}" ${S.fSta === k ? 'selected' : ''}>${v[0]}</option>`).join('')}</select>
@@ -599,7 +638,7 @@ function renderItems(){
     box.innerHTML = `<div class="empty"><div class="big">${ic('home', 34)}</div><h3>Nenhum imóvel ainda</h3><p>Toque em <b>Novo imóvel</b> para cadastrar o primeiro. Fotos, vídeos e documentos ficam todos na pasta dele.</p></div>`; return;
   }
   if (!list.length){ box.innerHTML = '<div class="empty">Nenhum imóvel encontrado com esse filtro.</div>'; return; }
-  box.innerHTML = `<div class="cards">${list.map(r => {
+  box.innerHTML = `<div class="cards ${S.vmode}">${list.map(r => {
     const st = STATUS[r.status] || STATUS.disponivel;
     return `<button class="card" data-a="open" data-id="${r.id}">
       <div class="cover" style="${r.capa?.thumb ? `background-image:url('${r.capa.thumb}')` : ''}">${r.capa?.thumb ? '' : ic('image', 28)}</div>
@@ -906,6 +945,7 @@ const A = {
   'sheet-close': () => closeSheet(),
   'new': () => openForm(null),
   'open': el => openDetail(el.dataset.id),
+  'vm': el => { S.vmode = el.dataset.m; LS.set('imob_vmode', S.vmode); document.querySelectorAll('.vt button').forEach(b => b.classList.toggle('on', b.dataset.m === S.vmode)); renderItems(); },
   'back': () => history.back(),
   'edit': () => openForm(cur()),
   'tab': el => { S.tab = el.dataset.t; S.selMode = false; S.sel.clear(); if (S.tab === 'dados') renderTab(); else loadTab(); },

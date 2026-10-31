@@ -1,6 +1,6 @@
 // Service worker simples: abre o app mesmo com internet ruim. Dados e arquivos vêm sempre do Google Drive.
-const V = 'imob-v2';
-const SHELL = ['./', 'index.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'logo.jpg', 'emblem.jpg'];
+const V = 'imob-v3';
+const SHELL = ['./', 'index.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'logo.jpg', 'emblem.jpg', 'logo-topo.jpg', 'marca-fundo.png'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(V).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
